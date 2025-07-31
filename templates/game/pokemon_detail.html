@@ -1,0 +1,271 @@
+{% extends 'base.html' %}
+{% load math_filters %}
+
+{% block title %}{{ pokemon.display_name }} - Pokemon Vortex{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card rarity-{{ pokemon.species.rarity }} {% if pokemon.is_shiny %}shiny{% endif %}">
+            <div class="card-header text-center">
+                <h3 class="mb-0">
+                    {{ pokemon.display_name }}
+                    {% if pokemon.is_favorite %}
+                        <i class="fas fa-heart text-danger" title="Favorite"></i>
+                    {% endif %}
+                    {% if pokemon.is_shiny %}
+                        <i class="fas fa-star text-warning" title="Shiny Pokemon!"></i>
+                    {% endif %}
+                </h3>
+                <p class="text-muted mb-0">{{ pokemon.species.name }} • Level {{ pokemon.level }}</p>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        {% if pokemon.species.sprite_url %}
+                            <img src="{{ pokemon.species.sprite_url }}" alt="{{ pokemon.species.name }}" class="img-fluid mb-3" style="max-height: 150px;">
+                        {% else %}
+                            <div class="bg-light rounded p-5 mb-3">
+                                <i class="fas fa-question fa-4x text-muted"></i>
+                            </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <span class="type-badge type-{{ pokemon.species.type1|lower }} text-white">
+                                {{ pokemon.species.type1 }}
+                            </span>
+                            {% if pokemon.species.type2 %}
+                                <span class="type-badge type-{{ pokemon.species.type2|lower }} text-white">
+                                    {{ pokemon.species.type2 }}
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="badge bg-{{ pokemon.species.rarity }} text-white mb-3">
+                            {{ pokemon.species.get_rarity_display }}
+                        </div>
+                    </div>
+
+                    <div class="col-md-8">
+                        <!-- HP Bar -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between">
+                                <strong>HP</strong>
+                                <span>{{ pokemon.current_hp }}/{{ pokemon.max_hp }}</span>
+                            </div>
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar bg-success" style="width: {{ pokemon.current_hp|mul:100|div:pokemon.max_hp }}%"></div>
+                            </div>
+                            {% if pokemon.current_hp <= 0 %}
+                                <small class="text-danger">This Pokemon has fainted!</small>
+                            {% elif pokemon.current_hp < pokemon.max_hp %}
+                                <small class="text-warning">This Pokemon is injured.</small>
+                            {% endif %}
+                        </div>
+
+                        <!-- Experience -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between">
+                                <strong>Experience</strong>
+                                <span>{{ pokemon.experience }} XP</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-info" style="width: 75%"></div>
+                            </div>
+                            <small class="text-muted">Next level at {{ pokemon.level|add:1|mul:100 }} XP</small>
+                        </div>
+
+                        <!-- Stats -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5>Stats</h5>
+                                <div class="row">
+                                    <div class="col-6 col-md-4 mb-2">
+                                        <div class="card bg-light">
+                                            <div class="card-body text-center p-2">
+                                                <div class="small text-muted">Attack</div>
+                                                <strong>{{ pokemon.attack_stat }}</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-4 mb-2">
+                                        <div class="card bg-light">
+                                            <div class="card-body text-center p-2">
+                                                <div class="small text-muted">Defense</div>
+                                                <strong>{{ pokemon.defense_stat }}</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-4 mb-2">
+                                        <div class="card bg-light">
+                                            <div class="card-body text-center p-2">
+                                                <div class="small text-muted">Sp. Attack</div>
+                                                <strong>{{ pokemon.sp_attack_stat }}</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-4 mb-2">
+                                        <div class="card bg-light">
+                                            <div class="card-body text-center p-2">
+                                                <div class="small text-muted">Sp. Defense</div>
+                                                <strong>{{ pokemon.sp_defense_stat }}</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-4 mb-2">
+                                        <div class="card bg-light">
+                                            <div class="card-body text-center p-2">
+                                                <div class="small text-muted">Speed</div>
+                                                <strong>{{ pokemon.speed_stat }}</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-4 mb-2">
+                                        <div class="card bg-light">
+                                            <div class="card-body text-center p-2">
+                                                <div class="small text-muted">Total</div>
+                                                <strong>{{ pokemon.total_stats }}</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Individual Values -->
+                        <div class="mb-4">
+                            <h5>Individual Values (IVs)</h5>
+                            <div class="row">
+                                <div class="col-6 col-md-4 mb-2">
+                                    <div class="small text-muted">HP IV</div>
+                                    <div class="progress" style="height: 15px;">
+                                        <div class="progress-bar" style="width: {{ pokemon.iv_hp|mul:100|div:31 }}%">{{ pokemon.iv_hp }}</div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-4 mb-2">
+                                    <div class="small text-muted">Attack IV</div>
+                                    <div class="progress" style="height: 15px;">
+                                        <div class="progress-bar" style="width: {{ pokemon.iv_attack|mul:100|div:31 }}%">{{ pokemon.iv_attack }}</div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-4 mb-2">
+                                    <div class="small text-muted">Defense IV</div>
+                                    <div class="progress" style="height: 15px;">
+                                        <div class="progress-bar" style="width: {{ pokemon.iv_defense|mul:100|div:31 }}%">{{ pokemon.iv_defense }}</div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-4 mb-2">
+                                    <div class="small text-muted">Sp. Att IV</div>
+                                    <div class="progress" style="height: 15px;">
+                                        <div class="progress-bar" style="width: {{ pokemon.iv_sp_attack|mul:100|div:31 }}%">{{ pokemon.iv_sp_attack }}</div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-4 mb-2">
+                                    <div class="small text-muted">Sp. Def IV</div>
+                                    <div class="progress" style="height: 15px;">
+                                        <div class="progress-bar" style="width: {{ pokemon.iv_sp_defense|mul:100|div:31 }}%">{{ pokemon.iv_sp_defense }}</div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-4 mb-2">
+                                    <div class="small text-muted">Speed IV</div>
+                                    <div class="progress" style="height: 15px;">
+                                        <div class="progress-bar" style="width: {{ pokemon.iv_speed|mul:100|div:31 }}%">{{ pokemon.iv_speed }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <strong>Overall IV: {{ pokemon.iv_percentage }}%</strong>
+                                {% if pokemon.iv_percentage >= 90 %}
+                                    <span class="badge bg-success">Excellent</span>
+                                {% elif pokemon.iv_percentage >= 80 %}
+                                    <span class="badge bg-primary">Very Good</span>
+                                {% elif pokemon.iv_percentage >= 70 %}
+                                    <span class="badge bg-info">Good</span>
+                                {% elif pokemon.iv_percentage >= 50 %}
+                                    <span class="badge bg-warning">Average</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Below Average</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Battle Record -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h6>Battle Record</h6>
+                                <div class="row">
+                                    <div class="col-4">
+                                        <div class="text-success">
+                                            <strong>{{ pokemon.battles_won }}</strong>
+                                            <div class="small">Wins</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="text-danger">
+                                            <strong>{{ pokemon.battles_lost }}</strong>
+                                            <div class="small">Losses</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="text-info">
+                                            <strong>
+                                                {% if pokemon.battles_won > 0 or pokemon.battles_lost > 0 %}
+                                                    {{ pokemon.battles_won|mul:100|div:pokemon.battles_won|add:pokemon.battles_lost|floatformat:1 }}%
+                                                {% else %}
+                                                    0%
+                                                {% endif %}
+                                            </strong>
+                                            <div class="small">Win Rate</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h6>Pokemon Info</h6>
+                                <div class="small text-muted">
+                                    <div>Caught {{ pokemon.caught_at|date:"M j, Y" }}</div>
+                                    <div>{{ pokemon.caught_at|timesince }} ago</div>
+                                    {% if pokemon.can_evolve %}
+                                        <div class="text-success mt-2">
+                                            <i class="fas fa-arrow-up"></i> Can evolve!
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <a href="{% url 'game:pokemon_list' %}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-arrow-left"></i> Back to Collection
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        {% if pokemon.current_hp > 0 %}
+                            <a href="{% url 'game:battle_wild' %}" class="btn btn-danger w-100">
+                                <i class="fas fa-fist-raised"></i> Battle with this Pokemon
+                            </a>
+                        {% else %}
+                            <button class="btn btn-secondary w-100" disabled>
+                                <i class="fas fa-heart-broken"></i> Pokemon Fainted
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

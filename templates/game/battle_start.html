@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load math_filters %}
+
+{% block title %}Battle Wild Pokemon - Pokemon Vortex{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header text-center">
+                <h3 class="mb-0">
+                    <i class="fas fa-fist-raised text-danger"></i>
+                    Battle Wild Pokemon
+                </h3>
+            </div>
+            <div class="card-body">
+                {% if not user_pokemon %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-heart-broken fa-4x text-muted mb-3"></i>
+                        <h4>No Pokemon Available</h4>
+                        <p class="text-muted mb-4">
+                            You don't have any healthy Pokemon to battle with.
+                            Catch some Pokemon first or heal your fainted Pokemon.
+                        </p>
+                        <a href="{% url 'game:catch_pokemon' %}" class="btn btn-success">
+                            <i class="fas fa-search"></i> Catch Pokemon
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="mb-4 text-center">
+                        <h5>Choose Your Pokemon</h5>
+                        <p class="text-muted">Select a Pokemon to battle with wild Pokemon</p>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row">
+                            {% for pokemon in user_pokemon %}
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="card pokemon-card rarity-{{ pokemon.species.rarity }} h-100 {% if pokemon.is_shiny %}shiny{% endif %}">
+                                    <div class="card-body">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="pokemon_id"
+                                                   value="{{ pokemon.id }}" id="pokemon{{ pokemon.id }}" required>
+                                            <label class="form-check-label w-100" for="pokemon{{ pokemon.id }}">
+                                                <div class="text-center">
+                                                    {% if pokemon.species.sprite_url %}
+                                                        <img src="{{ pokemon.species.sprite_url }}" alt="{{ pokemon.species.name }}"
+                                                             class="img-fluid mb-2" style="max-height: 80px;">
+                                                    {% else %}
+                                                        <div class="bg-light rounded p-3 mb-2">
+                                                            <i class="fas fa-question fa-2x text-muted"></i>
+                                                        </div>
+                                                    {% endif %}
+
+                                                    <h6 class="mb-1">
+                                                        {{ pokemon.display_name }}
+                                                        {% if pokemon.is_shiny %}
+                                                            <i class="fas fa-star text-warning" title="Shiny!"></i>
+                                                        {% endif %}
+                                                    </h6>
+                                                    <p class="small text-muted mb-2">Level {{ pokemon.level }}</p>
+
+                                                    <div class="mb-2">
+                                                        <span class="type-badge type-{{ pokemon.species.type1|lower }} text-white small">
+                                                            {{ pokemon.species.type1 }}
+                                                        </span>
+                                                        {% if pokemon.species.type2 %}
+                                                            <span class="type-badge type-{{ pokemon.species.type2|lower }} text-white small">
+                                                                {{ pokemon.species.type2 }}
+                                                            </span>
+                                                        {% endif %}
+                                                    </div>
+
+                                                    <!-- HP Bar -->
+                                                    <div class="mb-2">
+                                                        <div class="d-flex justify-content-between small">
+                                                            <span>HP</span>
+                                                            <span>{{ pokemon.current_hp }}/{{ pokemon.max_hp }}</span>
+                                                        </div>
+                                                        <div class="hp-bar bg-light">
+                                                            <div class="bg-success h-100" style="width: {{ pokemon.current_hp|mul:100|div:pokemon.max_hp }}%"></div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="small text-muted">
+                                                        <div>Attack: {{ pokemon.attack_stat }}</div>
+                                                        <div>Defense: {{ pokemon.defense_stat }}</div>
+                                                        <div>Speed: {{ pokemon.speed_stat }}</div>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="fas fa-fist-raised"></i> Start Battle!
+                            </button>
+                            <a href="{% url 'game:dashboard' %}" class="btn btn-outline-secondary btn-lg ms-2">
+                                <i class="fas fa-arrow-left"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+
+                    <div class="mt-4">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h6><i class="fas fa-info-circle text-info"></i> Battle Tips:</h6>
+                                <ul class="small mb-0">
+                                    <li>Choose Pokemon with high HP for longer battles</li>
+                                    <li>Higher level Pokemon have better stats</li>
+                                    <li>Type advantages matter in battles</li>
+                                    <li>Win battles to earn experience and coins</li>
+                                    <li>Fainted Pokemon can't battle until healed</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

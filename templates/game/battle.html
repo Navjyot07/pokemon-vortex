@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+{% load math_filters %}
+
+{% block title %}Battle - Pokemon Vortex{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header text-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-fist-raised text-danger"></i>
+                    {{ battle.player_pokemon.display_name }} vs Wild {{ battle.opponent_pokemon.name }}
+                </h4>
+                <small class="text-muted">Turn {{ battle.turns }}</small>
+            </div>
+            <div class="card-body">
+                <!-- Battle Arena -->
+                <div class="battle-arena mb-4" style="min-height: 300px; background: linear-gradient(to bottom, #87CEEB 0%, #90EE90 100%); border-radius: 10px; position: relative;">
+                    <div class="row h-100 align-items-center">
+                        <!-- Player Pokemon -->
+                        <div class="col-6 text-center">
+                            <div class="player-side">
+                                <h5>{{ battle.player_pokemon.display_name }}</h5>
+                                <div class="pokemon-sprite mb-3">
+                                    {% if battle.player_pokemon.species.sprite_url %}
+                                        <img src="{{ battle.player_pokemon.species.sprite_url }}"
+                                             alt="{{ battle.player_pokemon.species.name }}"
+                                             class="img-fluid" style="max-height: 120px;">
+                                    {% else %}
+                                        <div class="bg-light rounded p-4">
+                                            <i class="fas fa-question fa-3x text-muted"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="pokemon-info">
+                                    <div class="mb-2">
+                                        <small>Level {{ battle.player_pokemon.level }}</small>
+                                    </div>
+                                    <div class="mb-2">
+                                        <div class="d-flex justify-content-between small">
+                                            <span>HP</span>
+                                            <span>{{ battle.player_pokemon.current_hp }}/{{ battle.player_pokemon.max_hp }}</span>
+                                        </div>
+                                        <div class="progress" style="height: 15px;">
+                                            <div class="progress-bar bg-success"
+                                                 style="width: {{ battle.player_pokemon.current_hp|mul:100|div:battle.player_pokemon.max_hp }}%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- VS Divider -->
+                        <div class="col-12 text-center position-absolute" style="top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10;">
+                            <div class="bg-danger text-white rounded-circle d-inline-flex align-items-center justify-content-center"
+                                 style="width: 60px; height: 60px;">
+                                <strong>VS</strong>
+                            </div>
+                        </div>
+
+                        <!-- Opponent Pokemon -->
+                        <div class="col-6 text-center">
+                            <div class="opponent-side">
+                                <h5>Wild {{ battle.opponent_pokemon.name }}</h5>
+                                <div class="pokemon-sprite mb-3">
+                                    {% if battle.opponent_pokemon.sprite_url %}
+                                        <img src="{{ battle.opponent_pokemon.sprite_url }}"
+                                             alt="{{ battle.opponent_pokemon.name }}"
+                                             class="img-fluid" style="max-height: 120px;">
+                                    {% else %}
+                                        <div class="bg-light rounded p-4">
+                                            <i class="fas fa-question fa-3x text-muted"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="pokemon-info">
+                                    <div class="mb-2">
+                                        <small>Level {{ battle.opponent_level }}</small>
+                                    </div>
+                                    <div class="mb-2">
+                                        <span class="type-badge type-{{ battle.opponent_pokemon.type1|lower }} text-white small">
+                                            {{ battle.opponent_pokemon.type1 }}
+                                        </span>
+                                        {% if battle.opponent_pokemon.type2 %}
+                                            <span class="type-badge type-{{ battle.opponent_pokemon.type2|lower }} text-white small">
+                                                {{ battle.opponent_pokemon.type2 }}
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Battle Actions -->
+                {% csrf_token %}
+                {% if battle.status == 'ongoing' %}
+                <div class="battle-actions mb-4" id="battle-actions">
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <button class="btn btn-danger btn-lg w-100"
+                                    hx-post="{% url 'game:battle_action' battle.id %}"
+                                    hx-vals='{"action": "attack"}'
+                                    hx-target="#battle-content"
+                                    hx-swap="outerHTML">
+                                <i class="fas fa-sword"></i> Attack
+                            </button>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <button class="btn btn-warning btn-lg w-100"
+                                    hx-post="{% url 'game:battle_action' battle.id %}"
+                                    hx-vals='{"action": "flee"}'
+                                    hx-target="#battle-content"
+                                    hx-swap="outerHTML">
+                                <i class="fas fa-running"></i> Flee
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Battle Log -->
+                <div class="battle-log">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-scroll"></i> Battle Log
+                            </h6>
+                        </div>
+                        <div class="card-body" style="max-height: 200px; overflow-y: auto;" id="battle-log">
+                            {% for log_entry in battle_log %}
+                            <div class="log-entry mb-1">
+                                <small class="text-muted">Turn {{ log_entry.turn }}:</small>
+                                {{ log_entry.message }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if battle.status != 'ongoing' %}
+                <div class="text-center mt-4">
+                    <a href="{% url 'game:dashboard' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-home"></i> Back to Dashboard
+                    </a>
+                    <a href="{% url 'game:battle_wild' %}" class="btn btn-success btn-lg ms-2">
+                        <i class="fas fa-fist-raised"></i> Battle Again
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="battle-content" style="display: none;">
+    <!-- This will be replaced by HTMX responses -->
+</div>
+
+<script>
+// Auto-scroll battle log to bottom
+function scrollBattleLog() {
+    const battleLog = document.getElementById('battle-log');
+    if (battleLog) {
+        battleLog.scrollTop = battleLog.scrollHeight;
+    }
+}
+
+// Scroll on page load
+document.addEventListener('DOMContentLoaded', scrollBattleLog);
+
+// Scroll after HTMX updates
+document.body.addEventListener('htmx:afterSwap', function(evt) {
+    scrollBattleLog();
+});
+
+// Disable buttons during HTMX requests
+document.body.addEventListener('htmx:beforeRequest', function(evt) {
+    const buttons = document.querySelectorAll('#battle-actions button');
+    buttons.forEach(btn => {
+        btn.disabled = true;
+        const icon = btn.querySelector('i');
+        if (icon) {
+            icon.className = 'fas fa-spinner fa-spin';
+        }
+    });
+});
+
+document.body.addEventListener('htmx:afterRequest', function(evt) {
+    const buttons = document.querySelectorAll('#battle-actions button');
+    buttons.forEach(btn => {
+        btn.disabled = false;
+    });
+});
+</script>
+{% endblock %}
+

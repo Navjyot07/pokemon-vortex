@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome to Pokemon Vortex{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto text-center">
+        <div class="hero-section py-5">
+            <h1 class="display-4 fw-bold text-primary mb-4">
+                <i class="fas fa-bolt text-warning"></i>
+                Welcome to Pokemon Vortex!
+            </h1>
+            <p class="lead mb-4">
+                Embark on an epic journey to catch, train, and battle Pokemon in this exciting web-based adventure!
+            </p>
+            
+            <div class="row mb-5">
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-search fa-3x text-success mb-3"></i>
+                            <h5>Catch Pokemon</h5>
+                            <p class="text-muted">Discover and catch wild Pokemon with different rarities and abilities.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-fist-raised fa-3x text-danger mb-3"></i>
+                            <h5>Battle System</h5>
+                            <p class="text-muted">Engage in strategic battles with wild Pokemon and other trainers.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-trophy fa-3x text-warning mb-3"></i>
+                            <h5>Collect & Train</h5>
+                            <p class="text-muted">Build your collection and train your Pokemon to become stronger.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2 d-md-block">
+                <a href="{% url 'account_signup' %}" class="btn btn-primary btn-lg px-5 me-3">
+                    <i class="fas fa-user-plus"></i> Start Your Journey
+                </a>
+                <a href="{% url 'account_login' %}" class="btn btn-outline-primary btn-lg px-5">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-12">
+        <h3 class="text-center mb-4">Game Features</h3>
+        <div class="row">
+            <div class="col-lg-6 mb-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-dice text-primary"></i> Random Encounters
+                        </h5>
+                        <p class="card-text">
+                            Experience the thrill of random Pokemon encounters with weighted rarity system. 
+                            From common Pidgey to legendary Mewtwo!
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-chart-line text-success"></i> Level & Progress
+                        </h5>
+                        <p class="card-text">
+                            Level up your trainer and Pokemon through battles and catches. 
+                            Unlock new features and stronger Pokemon as you progress.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-star text-warning"></i> Individual Values
+                        </h5>
+                        <p class="card-text">
+                            Each Pokemon has unique Individual Values (IVs) that determine their potential. 
+                            Find that perfect Pokemon with maximum stats!
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-shopping-cart text-info"></i> In-Game Shop
+                        </h5>
+                        <p class="card-text">
+                            Purchase Pokeballs, potions, and other items with coins earned through battles and achievements.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+
+{% block title %}Shop - Pokemon Vortex{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2 class="mb-0">Pokemon Shop</h2>
+        <p class="text-muted">Purchase items with your coins</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <div class="card bg-success text-white">
+            <div class="card-body text-center p-3">
+                <h5 class="mb-0">
+                    <i class="fas fa-coins"></i> {{ profile.coins }} Coins
+                </h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Pokeballs Section -->
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-circle text-danger"></i> Pokeballs
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="card border-danger">
+                            <div class="card-body text-center">
+                                <i class="fas fa-circle fa-3x text-danger mb-3"></i>
+                                <h5>Pokeball</h5>
+                                <p class="text-muted">Basic catching device</p>
+                                <div class="mb-3">
+                                    <span class="badge bg-info">You have: {{ profile.pokeballs }}</span>
+                                </div>
+                                <form method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="item" value="pokeball">
+                                    <div class="input-group mb-3">
+                                        <input type="number" name="quantity" class="form-control" value="1" min="1" max="50">
+                                        <span class="input-group-text">x 200 coins</span>
+                                    </div>
+                                    <button type="submit" class="btn btn-danger w-100" 
+                                            {% if profile.coins < 200 %}disabled{% endif %}>
+                                        <i class="fas fa-shopping-cart"></i> Buy
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="card border-primary">
+                            <div class="card-body text-center">
+                                <i class="fas fa-circle fa-3x text-primary mb-3"></i>
+                                <h5>Great Ball</h5>
+                                <p class="text-muted">Better catch rate than Pokeball</p>
+                                <div class="mb-3">
+                                    <span class="badge bg-info">You have: {{ profile.great_balls }}</span>
+                                </div>
+                                <form method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="item" value="great_ball">
+                                    <div class="input-group mb-3">
+                                        <input type="number" name="quantity" class="form-control" value="1" min="1" max="50">
+                                        <span class="input-group-text">x 600 coins</span>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100" 
+                                            {% if profile.coins < 600 %}disabled{% endif %}>
+                                        <i class="fas fa-shopping-cart"></i> Buy
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="card border-warning">
+                            <div class="card-body text-center">
+                                <i class="fas fa-circle fa-3x text-warning mb-3"></i>
+                                <h5>Ultra Ball</h5>
+                                <p class="text-muted">Excellent catch rate</p>
+                                <div class="mb-3">
+                                    <span class="badge bg-info">You have: {{ profile.ultra_balls }}</span>
+                                </div>
+                                <form method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="item" value="ultra_ball">
+                                    <div class="input-group mb-3">
+                                        <input type="number" name="quantity" class="form-control" value="1" min="1" max="50">
+                                        <span class="input-group-text">x 1200 coins</span>
+                                    </div>
+                                    <button type="submit" class="btn btn-warning w-100" 
+                                            {% if profile.coins < 1200 %}disabled{% endif %}>
+                                        <i class="fas fa-shopping-cart"></i> Buy
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Current Inventory -->
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-backpack"></i> Your Inventory
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <i class="fas fa-circle fa-2x text-danger mb-2"></i>
+                                <h6>Pokeballs</h6>
+                                <h4 class="text-primary">{{ profile.pokeballs }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <i class="fas fa-circle fa-2x text-primary mb-2"></i>
+                                <h6>Great Balls</h6>
+                                <h4 class="text-primary">{{ profile.great_balls }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <i class="fas fa-circle fa-2x text-warning mb-2"></i>
+                                <h6>Ultra Balls</h6>
+                                <h4 class="text-primary">{{ profile.ultra_balls }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <i class="fas fa-circle fa-2x text-info mb-2"></i>
+                                <h6>Master Balls</h6>
+                                <h4 class="text-primary">{{ profile.master_balls }}</h4>
+                                <small class="text-muted">Special reward</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- How to Earn Coins -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle"></i> How to Earn Coins
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="text-center">
+                            <i class="fas fa-fist-raised fa-2x text-danger mb-2"></i>
+                            <h6>Win Battles</h6>
+                            <p class="text-muted small">Earn coins by winning battles against wild Pokemon. Higher level opponents give more coins!</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="text-center">
+                            <i class="fas fa-level-up-alt fa-2x text-success mb-2"></i>
+                            <h6>Level Up</h6>
+                            <p class="text-muted small">Get bonus coins every time you level up your trainer. Higher levels = bigger bonuses!</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="text-center">
+                            <i class="fas fa-trophy fa-2x text-warning mb-2"></i>
+                            <h6>Achievements</h6>
+                            <p class="text-muted small">Complete various achievements to earn bonus coins and special rewards.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if profile.coins < 200 %}
+<div class="alert alert-info mt-4">
+    <i class="fas fa-info-circle"></i>
+    <strong>Need more coins?</strong> Battle wild Pokemon to earn coins! Each victory rewards you with coins based on the opponent's level.
+</div>
+{% endif %}
+{% endblock %}
+

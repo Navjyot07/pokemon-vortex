@@ -1,0 +1,15 @@
+                            </div>
+
+                            <form method="post" hx-post="{% url 'game:catch_pokemon' %}" hx-target="#catch-result" hx-swap="innerHTML">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-lg" id="catch-btn">
+                                    <i class="fas fa-search"></i> Search for Pokemon
+                                </button>
+                            </form>
+
+                            <div id="catch-result" class="mt-4"></div>
+                        </div>
+
+                        <div class="mt-4">
+                            <h5>Catch Tips:</h5>
+                            <ul class="list-unstyled text-start">

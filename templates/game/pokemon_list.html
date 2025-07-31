@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block title %}My Pokemon - Pokemon Vortex{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2 class="mb-0">My Pokemon Collection</h2>
+        <p class="text-muted">{{ pokemon.count }} Pokemon in your collection</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{% url 'game:catch_pokemon' %}" class="btn btn-success">
+            <i class="fas fa-plus"></i> Catch More Pokemon
+        </a>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Filter by Type</label>
+                        <select name="type" class="form-select" onchange="this.form.submit()">
+                            <option value="">All Types</option>
+                            <option value="Normal" {% if current_type == 'Normal' %}selected{% endif %}>Normal</option>
+                            <option value="Fire" {% if current_type == 'Fire' %}selected{% endif %}>Fire</option>
+                            <option value="Water" {% if current_type == 'Water' %}selected{% endif %}>Water</option>
+                            <option value="Electric" {% if current_type == 'Electric' %}selected{% endif %}>Electric</option>
+                            <option value="Grass" {% if current_type == 'Grass' %}selected{% endif %}>Grass</option>
+                            <option value="Poison" {% if current_type == 'Poison' %}selected{% endif %}>Poison</option>
+                            <option value="Flying" {% if current_type == 'Flying' %}selected{% endif %}>Flying</option>
+                            <option value="Bug" {% if current_type == 'Bug' %}selected{% endif %}>Bug</option>
+                            <option value="Psychic" {% if current_type == 'Psychic' %}selected{% endif %}>Psychic</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Sort by</label>
+                        <select name="sort" class="form-select" onchange="this.form.submit()">
+                            <option value="caught_at" {% if current_sort == 'caught_at' %}selected{% endif %}>Recently Caught</option>
+                            <option value="level" {% if current_sort == 'level' %}selected{% endif %}>Level (High to Low)</option>
+                            <option value="name" {% if current_sort == 'name' %}selected{% endif %}>Name (A-Z)</option>
+                            <option value="iv" {% if current_sort == 'iv' %}selected{% endif %}>IV Percentage</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="fas fa-filter"></i> Apply Filters
+                        </button>
+                        <a href="{% url 'game:pokemon_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Clear
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pokemon Grid -->
+{% if pokemon %}
+<div class="row">
+    {% for poke in pokemon %}
+    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+        <div class="card pokemon-card rarity-{{ poke.species.rarity }} h-100 {% if poke.is_shiny %}shiny{% endif %}">
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    {% if poke.species.sprite_url %}
+                        <img src="{{ poke.species.sprite_url }}" alt="{{ poke.species.name }}" class="img-fluid mb-2" style="max-height: 96px;">
+                    {% else %}
+                        <div class="bg-light rounded p-4 mb-2">
+                            <i class="fas fa-question fa-3x text-muted"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <h5 class="card-title mb-1">
+                        {{ poke.display_name }}
+                        {% if poke.is_favorite %}
+                            <i class="fas fa-heart text-danger" title="Favorite"></i>
+                        {% endif %}
+                        {% if poke.is_shiny %}
+                            <i class="fas fa-star text-warning" title="Shiny!"></i>
+                        {% endif %}
+                    </h5>
+                    <p class="text-muted small mb-2">{{ poke.species.name }} • Level {{ poke.level }}</p>
+                    
+                    <div class="mb-2">
+                        <span class="type-badge type-{{ poke.species.type1|lower }} text-white small">
+                            {{ poke.species.type1 }}
+                        </span>
+                        {% if poke.species.type2 %}
+                            <span class="type-badge type-{{ poke.species.type2|lower }} text-white small">
+                                {{ poke.species.type2 }}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- HP Bar -->
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between small">
+                        <span>HP</span>
+                        <span>{{ poke.current_hp }}/{{ poke.max_hp }}</span>
+                    </div>
+                    <div class="hp-bar bg-light">
+                        <div class="bg-success h-100" style="width: 75%"></div>
+                    </div>
+                </div>
+                
+                <!-- Stats -->
+                <div class="small text-muted mb-3">
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>IV:</strong> {{ poke.iv_percentage }}%
+                        </div>
+                        <div class="col-6">
+                            <strong>Total:</strong> {{ poke.total_stats }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>Battles:</strong> {{ poke.battles_won }}W/{{ poke.battles_lost }}L
+                        </div>
+                        <div class="col-6">
+                            <strong>Rarity:</strong> {{ poke.species.get_rarity_display }}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-grid">
+                    <a href="{% url 'game:pokemon_detail' poke.id %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-eye"></i> View Details
+                    </a>
+                </div>
+            </div>
+            <div class="card-footer text-muted small">
+                Caught {{ poke.caught_at|timesince }} ago
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5">
+    <i class="fas fa-search fa-4x text-muted mb-3"></i>
+    <h4>No Pokemon Found</h4>
+    <p class="text-muted mb-4">
+        {% if current_type or current_sort != 'caught_at' %}
+            No Pokemon match your current filters. Try adjusting your search criteria.
+        {% else %}
+            You haven't caught any Pokemon yet! Start your journey by catching your first Pokemon.
+        {% endif %}
+    </p>
+    <div>
+        {% if current_type or current_sort != 'caught_at' %}
+            <a href="{% url 'game:pokemon_list' %}" class="btn btn-outline-primary me-2">
+                <i class="fas fa-times"></i> Clear Filters
+            </a>
+        {% endif %}
+        <a href="{% url 'game:catch_pokemon' %}" class="btn btn-success">
+            <i class="fas fa-search"></i> Catch Pokemon
+        </a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+

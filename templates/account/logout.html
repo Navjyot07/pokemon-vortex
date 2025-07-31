@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Logout - Pokemon Vortex{% endblock %}
+
+{% block content %}
+<div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="row w-100 justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-warning text-dark text-center py-4">
+                    <h3 class="mb-0">
+                        <i class="fas fa-pokeball me-2"></i>
+                        Pokemon Vortex
+                    </h3>
+                    <p class="mb-0 opacity-75">See you later, Trainer!</p>
+                </div>
+                <div class="card-body p-4 text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-sign-out-alt fa-3x text-warning mb-3"></i>
+                        <h4>Are you sure you want to logout?</h4>
+                        <p class="text-muted">Your Pokemon will miss you!</p>
+                    </div>
+
+                    <form method="post" action="{% url 'account_logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-warning w-100 mb-3">
+                            <i class="fas fa-sign-out-alt me-1"></i>
+                            Yes, Logout
+                        </button>
+                    </form>
+
+                    <a href="{% url 'game:dashboard' %}" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        Stay and Continue Playing
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

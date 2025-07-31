@@ -1,0 +1,242 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Pokemon Vortex{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-0">Welcome back, {{ profile.trainer_name }}!</h2>
+        <p class="text-muted">Level {{ profile.level }} Trainer</p>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Level</h6>
+                        <h3 class="mb-0">{{ profile.level }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-level-up-alt fa-2x opacity-75"></i>
+                    </div>
+                </div>
+                <div class="progress mt-2" style="height: 4px;">
+                    <div class="progress-bar bg-light" style="width: 75%"></div>
+                </div>
+                <small>{{ profile.experience }}/1000 XP</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Coins</h6>
+                        <h3 class="mb-0">{{ profile.coins }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-coins fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Pokemon Caught</h6>
+                        <h3 class="mb-0">{{ profile.total_pokemon_caught }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-list fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card bg-warning text-dark">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Win Rate</h6>
+                        <h3 class="mb-0">{{ profile.win_rate }}%</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-trophy fa-2x opacity-75"></i>
+                    </div>
+                </div>
+                <small>{{ profile.battles_won }}W / {{ profile.battles_lost }}L</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'game:catch_pokemon' %}" class="btn btn-success w-100">
+                            <i class="fas fa-search"></i> Catch Pokemon
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'game:battle_wild' %}" class="btn btn-danger w-100">
+                            <i class="fas fa-fist-raised"></i> Battle Wild
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'game:pokemon_list' %}" class="btn btn-primary w-100">
+                            <i class="fas fa-list"></i> My Pokemon
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'game:shop' %}" class="btn btn-info w-100">
+                            <i class="fas fa-store"></i> Shop
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Inventory -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Inventory</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-3">
+                        <div class="p-2 border rounded">
+                            <i class="fas fa-circle text-danger"></i>
+                            <div class="small">Pokeball</div>
+                            <strong>{{ profile.pokeballs }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="p-2 border rounded">
+                            <i class="fas fa-circle text-primary"></i>
+                            <div class="small">Great Ball</div>
+                            <strong>{{ profile.great_balls }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="p-2 border rounded">
+                            <i class="fas fa-circle text-warning"></i>
+                            <div class="small">Ultra Ball</div>
+                            <strong>{{ profile.ultra_balls }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="p-2 border rounded">
+                            <i class="fas fa-circle text-info"></i>
+                            <div class="small">Master Ball</div>
+                            <strong>{{ profile.master_balls }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Daily Progress</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <span>Daily Catches</span>
+                        <span>{{ profile.daily_catches }}/50</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: 50%"></div>
+                    </div>
+                </div>
+                
+                {% if profile.daily_catches >= 50 %}
+                    <div class="alert alert-warning small mb-0">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Daily catch limit reached! Come back tomorrow.
+                    </div>
+                {% else %}
+                    <div class="alert alert-info small mb-0">
+                        <i class="fas fa-info-circle"></i>
+                        You can catch more Pokemon today!
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Pokemon -->
+{% if recent_pokemon %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Recent Pokemon</h5>
+                <a href="{% url 'game:pokemon_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for pokemon in recent_pokemon %}
+                    <div class="col-md-4 col-lg-2 mb-3">
+                        <div class="card pokemon-card rarity-{{ pokemon.species.rarity }} {% if pokemon.is_shiny %}shiny{% endif %}">
+                            <div class="card-body text-center p-2">
+                                {% if pokemon.species.sprite_url %}
+                                    <img src="{{ pokemon.species.sprite_url }}" alt="{{ pokemon.species.name }}" class="img-fluid mb-2" style="max-height: 64px;">
+                                {% else %}
+                                    <div class="bg-light rounded p-3 mb-2">
+                                        <i class="fas fa-question fa-2x text-muted"></i>
+                                    </div>
+                                {% endif %}
+                                <h6 class="card-title small mb-1">{{ pokemon.display_name }}</h6>
+                                <p class="small text-muted mb-1">Lv.{{ pokemon.level }}</p>
+                                <div class="mb-1">
+                                    <span class="type-badge type-{{ pokemon.species.type1|lower }} text-white small">
+                                        {{ pokemon.species.type1 }}
+                                    </span>
+                                    {% if pokemon.species.type2 %}
+                                        <span class="type-badge type-{{ pokemon.species.type2|lower }} text-white small">
+                                            {{ pokemon.species.type2 }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                {% if pokemon.is_shiny %}
+                                    <i class="fas fa-star text-warning" title="Shiny!"></i>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
