@@ -68,128 +68,127 @@ def pokemon_detail(request, pokemon_id):
     }
     return render(request, 'game/pokemon_detail.html', context)
 
-@login_required
-def catch_pokemon(request):
-    """Catch wild Pokemon"""
-    profile = request.user.userprofile
+# @login_required
+# def catch_pokemon(request):
+#     """Catch wild Pokemon"""
+#     profile = request.user.userprofile
 
-    # Check daily catch limit
-    today = timezone.now().date()
-    if profile.last_catch_reset != today:
-        profile.daily_catches = 0
-        profile.last_catch_reset = today
-        profile.save()
+#     # Check daily catch limit
+#     today = timezone.now().date()
+#     if profile.last_catch_reset != today:
+#         profile.daily_catches = 0
+#         profile.last_catch_reset = today
+#         profile.save()
 
-    if profile.daily_catches >= 50:  # Daily limit
-        if request.headers.get('HX-Request'):
-            return HttpResponse('<div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> You\'ve reached your daily catch limit!</div>')
-        messages.error(request, "You've reached your daily catch limit!")
-        return redirect('game:dashboard')
+#     if profile.daily_catches >= 50:  # Daily limit
+#         if request.headers.get('HX-Request'):
+#             return HttpResponse('<div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> You\'ve reached your daily catch limit!</div>')
+#         messages.error(request, "You've reached your daily catch limit!")
+#         return redirect('game:dashboard')
 
-    # Check if user has pokeballs
-    if profile.pokeballs <= 0:
-        if request.headers.get('HX-Request'):
-            return HttpResponse('<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> You don\'t have any Pokeballs! <a href="/shop/" class="alert-link">Buy more</a></div>')
-        messages.error(request, "You don't have any Pokeballs!")
-        return redirect('game:shop')
+#     # Check if user has pokeballs
+#     if profile.pokeballs <= 0:
+#         if request.headers.get('HX-Request'):
+#             return HttpResponse('<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> You don\'t have any Pokeballs! <a href="/shop/" class="alert-link">Buy more</a></div>')
+#         messages.error(request, "You don't have any Pokeballs!")
+#         return redirect('game:shop')
 
-    if request.method == 'POST':
-        # Prevent double submissions by checking if a catch was already processed in this session
-        last_catch_time = request.session.get('last_catch_time', 0)
-        current_time = time.time()
+#     if request.method == 'POST':
+#         # Prevent double submissions by checking if a catch was already processed in this session
+#         last_catch_time = request.session.get('last_catch_time', 0)
+#         current_time = time.time()
 
-        # Prevent catches within 2 seconds of each other
-        if current_time - last_catch_time < 2:
-            if request.headers.get('HX-Request'):
-                return HttpResponse('<div class="alert alert-info"><i class="fas fa-clock"></i> Please wait before searching again...</div>')
-            return redirect('game:catch_pokemon')
+#         # Prevent catches within 2 seconds of each other
+#         if current_time - last_catch_time < 2:
+#             if request.headers.get('HX-Request'):
+#                 return HttpResponse('<div class="alert alert-info"><i class="fas fa-clock"></i> Please wait before searching again...</div>')
+#             return redirect('game:catch_pokemon')
 
-        # Update last catch time
-        request.session['last_catch_time'] = current_time
+#         # Update last catch time
+#         request.session['last_catch_time'] = current_time
 
-        # Attempt to catch a random Pokemon
-        all_species = list(PokemonSpecies.objects.all())
-        if not all_species:
-            if request.headers.get('HX-Request'):
-                return HttpResponse('<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> No Pokemon species available!</div>')
-            messages.error(request, "No Pokemon species available!")
-            return redirect('game:dashboard')
+#         # Attempt to catch a random Pokemon
+#         all_species = list(PokemonSpecies.objects.all())
+#         if not all_species:
+#             if request.headers.get('HX-Request'):
+#                 return HttpResponse('<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> No Pokemon species available!</div>')
+#             messages.error(request, "No Pokemon species available!")
+#             return redirect('game:dashboard')
 
-        # Weighted random selection based on rarity
-        rarity_weights = {
-            'common': 50,
-            'uncommon': 25,
-            'rare': 15,
-            'epic': 7,
-            'legendary': 2,
-            'mythical': 1
-        }
+#         # Weighted random selection based on rarity
+#         rarity_weights = {
+#             'common': 50,
+#             'uncommon': 25,
+#             'rare': 15,
+#             'epic': 7,
+#             'legendary': 2,
+#             'mythical': 1
+#         }
 
-        weighted_species = []
-        for species in all_species:
-            weight = rarity_weights.get(species.rarity, 1)
-            weighted_species.extend([species] * weight)
+#         weighted_species = []
+#         for species in all_species:
+#             weight = rarity_weights.get(species.rarity, 1)
+#             weighted_species.extend([species] * weight)
 
-        wild_pokemon = random.choice(weighted_species)
-        wild_level = random.randint(1, min(profile.level + 5, 50))
+#         wild_pokemon = random.choice(weighted_species)
+#         wild_level = random.randint(1, min(profile.level + 5, 50))
 
-        # Calculate catch chance
-        catch_rate = wild_pokemon.catch_rate
-        level_modifier = max(0.1, 1 - (wild_level - profile.level) * 0.05)
-        catch_chance = (catch_rate / 255) * level_modifier
+#         # Calculate catch chance
+#         catch_rate = wild_pokemon.catch_rate
+#         level_modifier = max(0.1, 1 - (wild_level - profile.level) * 0.05)
+#         catch_chance = (catch_rate / 255) * level_modifier
 
-        # Use pokeball
-        profile.pokeballs -= 1
-        profile.daily_catches += 1
+#         # Use pokeball
+#         profile.pokeballs -= 1
 
-        if random.random() < catch_chance:
-            # Successful catch!
-            caught_pokemon = UserPokemon.objects.create(
-                owner=request.user,
-                species=wild_pokemon,
-                level=wild_level
-            )
+#         if random.random() < catch_chance:
+#             # Successful catch!
+#             caught_pokemon = UserPokemon.objects.create(
+#                 owner=request.user,
+#                 species=wild_pokemon,
+#                 level=wild_level
+#             )
+#             profile.daily_catches += 1
+#             profile.total_pokemon_caught += 1
+#             profile.add_experience(wild_level * 10)
+#             profile.save()
 
-            profile.total_pokemon_caught += 1
-            profile.add_experience(wild_level * 10)
-            profile.save()
+#             if request.headers.get('HX-Request'):
+#                 return HttpResponse(f'''
+#                     <div class="alert alert-success">
+#                         <h5><i class="fas fa-check-circle"></i> Congratulations!</h5>
+#                         <p class="mb-2">You caught a Level {wild_level} {wild_pokemon.name}!</p>
+#                         <div class="d-flex gap-2">
+#                             <a href="/pokemon/{caught_pokemon.id}/" class="btn btn-primary btn-sm">
+#                                 <i class="fas fa-eye"></i> View Pokemon
+#                             </a>
+#                             <button class="btn btn-success btn-sm" onclick="location.reload()">
+#                                 <i class="fas fa-search"></i> Search Again
+#                             </button>
+#                         </div>
+#                     </div>
+#                 ''')
+#             messages.success(request, f"Congratulations! You caught a Level {wild_level} {wild_pokemon.name}!")
+#             return redirect('game:pokemon_detail', pokemon_id=caught_pokemon.id)
+#         else:
+#             # Pokemon escaped
+#             profile.save()
+#             if request.headers.get('HX-Request'):
+#                 return HttpResponse(f'''
+#                     <div class="alert alert-warning">
+#                         <h5><i class="fas fa-exclamation-triangle"></i> Oh no!</h5>
+#                         <p class="mb-2">The wild Level {wild_level} {wild_pokemon.name} escaped!</p>
+#                         <button class="btn btn-warning btn-sm" onclick="location.reload()">
+#                             <i class="fas fa-search"></i> Try Again
+#                         </button>
+#                     </div>
+#                 ''')
+#             messages.warning(request, f"The wild {wild_pokemon.name} escaped!")
 
-            if request.headers.get('HX-Request'):
-                return HttpResponse(f'''
-                    <div class="alert alert-success">
-                        <h5><i class="fas fa-check-circle"></i> Congratulations!</h5>
-                        <p class="mb-2">You caught a Level {wild_level} {wild_pokemon.name}!</p>
-                        <div class="d-flex gap-2">
-                            <a href="/pokemon/{caught_pokemon.id}/" class="btn btn-primary btn-sm">
-                                <i class="fas fa-eye"></i> View Pokemon
-                            </a>
-                            <button class="btn btn-success btn-sm" onclick="location.reload()">
-                                <i class="fas fa-search"></i> Search Again
-                            </button>
-                        </div>
-                    </div>
-                ''')
-            messages.success(request, f"Congratulations! You caught a Level {wild_level} {wild_pokemon.name}!")
-            return redirect('game:pokemon_detail', pokemon_id=caught_pokemon.id)
-        else:
-            # Pokemon escaped
-            profile.save()
-            if request.headers.get('HX-Request'):
-                return HttpResponse(f'''
-                    <div class="alert alert-warning">
-                        <h5><i class="fas fa-exclamation-triangle"></i> Oh no!</h5>
-                        <p class="mb-2">The wild Level {wild_level} {wild_pokemon.name} escaped!</p>
-                        <button class="btn btn-warning btn-sm" onclick="location.reload()">
-                            <i class="fas fa-search"></i> Try Again
-                        </button>
-                    </div>
-                ''')
-            messages.warning(request, f"The wild {wild_pokemon.name} escaped!")
-
-    context = {
-        'profile': profile,
-    }
-    return render(request, 'game/catch.html', context)
+#     context = {
+#         'profile': profile,
+#     }
+#     return render(request, 'game/catch.html', context)
 
 @login_required
 def battle_wild(request):
@@ -384,4 +383,183 @@ def shop(request):
         'profile': profile,
     }
     return render(request, 'game/shop.html', context)
+
+
+@login_required
+def wild_map(request):
+    """Wild Pokemon map interface"""
+    profile = request.user.userprofile
+    pokemon_count = UserPokemon.objects.filter(owner=request.user).count()
+
+    # Check daily catch limit
+    today = timezone.now().date()
+    if profile.last_catch_reset != today:
+        profile.daily_catches = 0
+        profile.last_catch_reset = today
+        profile.save()
+
+    context = {
+        'profile': profile,
+        'pokemon_count': pokemon_count,
+    }
+    return render(request, 'game/wild_map.html', context)
+
+@login_required
+def encounter_pokemon(request):
+    """Generate a random Pokemon encounter for the map"""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': 'Invalid request method'})
+
+    profile = request.user.userprofile
+
+    # Check if user has pokeballs
+    if profile.pokeballs <= 0:
+        return JsonResponse({'success': False, 'message': "You don't have any Pokeballs!"})
+
+    # Check daily catch limit
+    today = timezone.now().date()
+    if profile.last_catch_reset != today:
+        profile.daily_catches = 0
+        profile.last_catch_reset = today
+        profile.save()
+
+    if profile.daily_catches >= 50:
+        return JsonResponse({'success': False, 'message': "You've reached your daily catch limit!"})
+
+    # Get all Pokemon species
+    all_species = list(PokemonSpecies.objects.all())
+    if not all_species:
+        return JsonResponse({'success': False, 'message': 'No Pokemon species available!'})
+
+    # Weighted random selection based on rarity
+    rarity_weights = {
+        'common': 50,
+        'rare': 25,
+        'epic': 15,
+        'legendary': 5,
+        'ultrabeast': 1,
+        'mythical': 1,
+    }
+
+    weighted_species = []
+    for species in all_species:
+        weight = rarity_weights.get(species.rarity, 1)
+        weighted_species.extend([species] * weight)
+
+    wild_pokemon = random.choice(weighted_species)
+    wild_level = random.randint(1, min(profile.level + 5, 50))
+
+    # Store encounter in session for catch attempt
+    request.session['current_encounter'] = {
+        'species_id': wild_pokemon.id,
+        'level': wild_level,
+        'timestamp': time.time()
+    }
+
+    return JsonResponse({
+        'success': True,
+        'pokemon': {
+            'id': wild_pokemon.id,
+            'name': wild_pokemon.name,
+            'level': wild_level,
+            'rarity': wild_pokemon.rarity
+        }
+    })
+
+@login_required
+def attempt_catch(request):
+    """Attempt to catch the encountered Pokemon"""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': 'Invalid request method'})
+
+    profile = request.user.userprofile
+
+    # Get encounter from session
+    encounter = request.session.get('current_encounter')
+    if not encounter:
+        return JsonResponse({'success': False, 'message': 'No active encounter!'})
+
+    # Check if encounter is still valid (within 5 minutes)
+    if time.time() - encounter['timestamp'] > 300:
+        del request.session['current_encounter']
+        return JsonResponse({'success': False, 'message': 'Encounter expired!'})
+
+    # Check if user has pokeballs
+    if profile.pokeballs <= 0:
+        return JsonResponse({'success': False, 'message': "You don't have any Pokeballs!"})
+
+    # Get the Pokemon species
+    try:
+        wild_pokemon = PokemonSpecies.objects.get(id=encounter['species_id'])
+    except PokemonSpecies.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Invalid Pokemon species!'})
+
+    wild_level = encounter['level']
+
+    # Calculate catch chance
+    catch_rate = wild_pokemon.catch_rate
+    level_modifier = max(0.1, 1 - (wild_level - profile.level) * 0.05)
+    catch_chance = (catch_rate / 255) * level_modifier
+
+    # Use pokeball
+    profile.pokeballs -= 1
+
+    if random.random() < catch_chance:
+        # Successful catch!
+        caught_pokemon = UserPokemon.objects.create(
+            owner=request.user,
+            species=wild_pokemon,
+            level=wild_level,
+            iv_hp=random.randint(0, 31),
+            iv_attack=random.randint(0, 31),
+            iv_defense=random.randint(0, 31),
+            iv_speed=random.randint(0, 31),
+        )
+
+        profile.daily_catches += 1
+
+        # Award experience and coins
+        exp_gained = wild_level * 10
+        coins_gained = wild_level * 5
+
+        profile.experience += exp_gained
+        profile.coins += coins_gained
+
+        # Check for level up
+        level_up = False
+        while profile.experience >= profile.level * 1000:
+            profile.experience -= profile.level * 1000
+            profile.level += 1
+            level_up = True
+
+        profile.save()
+
+        # Clear encounter
+        del request.session['current_encounter']
+
+        pokemon_count = UserPokemon.objects.filter(owner=request.user).count()
+
+        message = f"Caught {wild_pokemon.name} (Level {wild_level})!"
+        if level_up:
+            message += f" You leveled up to Level {profile.level}!"
+
+        return JsonResponse({
+            'success': True,
+            'message': message,
+            'pokeballs': profile.pokeballs,
+            'daily_catches': profile.daily_catches,
+            'pokemon_count': pokemon_count,
+            'exp_gained': exp_gained,
+            'coins_gained': coins_gained
+        })
+    else:
+        # Failed catch
+        profile.save()
+
+        return JsonResponse({
+            'success': False,
+            'message': f"{wild_pokemon.name} broke free!",
+            'pokeballs': profile.pokeballs,
+            'daily_catches': profile.daily_catches
+        })
 

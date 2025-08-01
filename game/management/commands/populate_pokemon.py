@@ -3,10 +3,10 @@ from game.models import PokemonSpecies, Item
 
 class Command(BaseCommand):
     help = 'Populate database with initial Pokemon and items'
-    
+
     def handle(self, *args, **options):
         self.stdout.write('Populating Pokemon species...')
-        
+
         # Create some starter Pokemon
         pokemon_data = [
             {
@@ -20,7 +20,7 @@ class Command(BaseCommand):
                 'base_sp_attack': 65,
                 'base_sp_defense': 65,
                 'base_speed': 45,
-                'rarity': 'uncommon',
+                'rarity': 'common',
                 'catch_rate': 45,
                 'evolution_level': 16,
                 'sprite_url': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png'
@@ -66,7 +66,7 @@ class Command(BaseCommand):
                 'base_sp_attack': 60,
                 'base_sp_defense': 50,
                 'base_speed': 65,
-                'rarity': 'uncommon',
+                'rarity': 'common',
                 'catch_rate': 45,
                 'evolution_level': 16,
                 'sprite_url': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png'
@@ -111,7 +111,7 @@ class Command(BaseCommand):
                 'base_sp_attack': 50,
                 'base_sp_defense': 64,
                 'base_speed': 43,
-                'rarity': 'uncommon',
+                'rarity': 'common',
                 'catch_rate': 45,
                 'evolution_level': 16,
                 'sprite_url': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png'
@@ -169,7 +169,7 @@ class Command(BaseCommand):
                 'base_sp_attack': 154,
                 'base_sp_defense': 90,
                 'base_speed': 130,
-                'rarity': 'legendary',
+                'rarity': 'mythical',
                 'catch_rate': 3,
                 'sprite_url': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/150.png'
             },
@@ -184,8 +184,38 @@ class Command(BaseCommand):
                 'base_sp_defense': 100,
                 'base_speed': 100,
                 'rarity': 'mythical',
-                'catch_rate': 45,
+                'catch_rate': 3,
                 'sprite_url': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/151.png'
+            },
+            {
+                'pokedex_id': 483,
+                'name': 'Dialga',
+                'type1': 'Steel',
+                'type2': 'Dragon',
+                'base_hp': 100,
+                'base_attack': 120,
+                'base_defense': 120,
+                'base_sp_attack': 150,
+                'base_sp_defense': 100,
+                'base_speed': 90,
+                'rarity': 'legendary',
+                'catch_rate': 3,
+                'sprite_url': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/483.png'
+            },
+            {
+                'pokedex_id': 487,
+                'name': 'Giratina',
+                'type1': 'Ghost',
+                'type2': 'Dragon',
+                'base_hp': 150,
+                'base_attack': 100,
+                'base_defense': 120,
+                'base_sp_attack': 100,
+                'base_sp_defense': 120,
+                'base_speed': 90,
+                'rarity': 'legendary',
+                'catch_rate': 3,
+                'sprite_url': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/487.png'
             },
             # Add some common Pokemon
             {
@@ -235,7 +265,7 @@ class Command(BaseCommand):
                 'sprite_url': 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10.png'
             },
         ]
-        
+
         created_count = 0
         for data in pokemon_data:
             pokemon, created = PokemonSpecies.objects.get_or_create(
@@ -245,41 +275,41 @@ class Command(BaseCommand):
             if created:
                 created_count += 1
                 self.stdout.write(f'Created {pokemon.name}')
-        
+
         # Set up evolution chains
         try:
             bulbasaur = PokemonSpecies.objects.get(pokedex_id=1)
             ivysaur = PokemonSpecies.objects.get(pokedex_id=2)
             venusaur = PokemonSpecies.objects.get(pokedex_id=3)
-            
+
             ivysaur.evolves_from = bulbasaur
             ivysaur.save()
             venusaur.evolves_from = ivysaur
             venusaur.save()
-            
+
             charmander = PokemonSpecies.objects.get(pokedex_id=4)
             charmeleon = PokemonSpecies.objects.get(pokedex_id=5)
             charizard = PokemonSpecies.objects.get(pokedex_id=6)
-            
+
             charmeleon.evolves_from = charmander
             charmeleon.save()
             charizard.evolves_from = charmeleon
             charizard.save()
-            
+
             squirtle = PokemonSpecies.objects.get(pokedex_id=7)
             wartortle = PokemonSpecies.objects.get(pokedex_id=8)
             blastoise = PokemonSpecies.objects.get(pokedex_id=9)
-            
+
             wartortle.evolves_from = squirtle
             wartortle.save()
             blastoise.evolves_from = wartortle
             blastoise.save()
-            
+
         except PokemonSpecies.DoesNotExist:
             pass
-        
+
         self.stdout.write(f'Created {created_count} new Pokemon species')
-        
+
         # Create basic items
         self.stdout.write('Creating items...')
         items_data = [
@@ -314,7 +344,7 @@ class Command(BaseCommand):
                 'price': 700,
             },
         ]
-        
+
         item_count = 0
         for data in items_data:
             item, created = Item.objects.get_or_create(
@@ -324,7 +354,7 @@ class Command(BaseCommand):
             if created:
                 item_count += 1
                 self.stdout.write(f'Created {item.name}')
-        
+
         self.stdout.write(f'Created {item_count} new items')
         self.stdout.write(
             self.style.SUCCESS('Successfully populated database!')
